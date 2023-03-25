@@ -140,12 +140,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="EquationCalculator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="StringMathSolver.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EquationCalculator.hpp" />
     <ClInclude Include="StringMathSolver.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
