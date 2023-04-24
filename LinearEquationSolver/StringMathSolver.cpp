@@ -10,7 +10,15 @@ std::string StringMathSolver::FormatEquation(std::string equation) {
 					break;
 				}
 			}
-			equation = equation.substr(0, i) + MulGroup(group, equation.substr(i, 1)) + equation.substr(i + group.length()+1, equation.length() + 1);
+
+			if (CanSolveAll(group)) {
+				std::string replaceStr = "";
+				replaceStr += equation[i];
+				replaceStr += " * ";
+				equation = equation.substr(0, i) + replaceStr + equation.substr(i + 1, equation.length() + 1);
+			}
+			else
+				equation = equation.substr(0, i) + MulGroup(group, equation.substr(i, 1)) + equation.substr(i + group.length()+1, equation.length() + 1);
 		}
 		else if (IsOperator(equation[i]) || equation[i] == '=') {
 			std::string replaceStr = "";
