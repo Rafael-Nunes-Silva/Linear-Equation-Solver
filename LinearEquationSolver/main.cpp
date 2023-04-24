@@ -59,14 +59,6 @@ void DisplayMenu() {
 }
 
 int main() {
-	/*
-	std::cout << StringMathSolver::SolveEquation("6(2x+3)+x-7=3(5x+7)+2x") << "\n";
-	std::cout << StringMathSolver::SolveEquation("x=(1+3*5)/(1+3)") << "\n";
-	std::cout << StringMathSolver::SolveEquation("2x+3(18/4)=7x-45") << "\n";
-	std::cout << StringMathSolver::SolveEquation("7x+3=2x+20") << "\n";
-	return 0;
-	*/
-
 	std::cout << "Linear Equation Solver\n";
 	do {
 		DisplayMenu();

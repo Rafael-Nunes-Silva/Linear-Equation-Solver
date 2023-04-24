@@ -2,74 +2,29 @@
 
 std::string StringMathSolver::FormatEquation(std::string equation) {
 	for (int i = equation.length(); i >= 0; i--) {
-		if (!IsOperator(equation[i]) && equation[i] != '=')
-			continue;
-		std::string replaceStr = "";
-		if (equation[i - 1] != ' ')
-			replaceStr += " ";
-		replaceStr += equation[i];
-		if (equation[i + 1] != ' ')
-			replaceStr += " ";
-
-		equation = equation.substr(0, i) + replaceStr + equation.substr(i + 1, equation.length() + 1);
-	}
-
-	return equation;
-
-	/*
-	for (int i = 0; i < equation.length(); i++) {
-
-	}
-
-	equation = ReplaceInString(equation, "+", " + ");
-	equation = ReplaceInString(equation, "-", " - ");
-	equation = ReplaceInString(equation, "*", " * ");
-	equation = ReplaceInString(equation, "/", " / ");
-	return equation;
-	*/
-	/*
-	std::vector<int> operatorsIndexes = std::vector<int>();
-
-	for (int i = equation.length() - 1; i > 0; i--) {
-		if (equation[i] == '(' && std::isdigit(equation[i - 1])) {
-			std::string num = GetNumberLeft(equation, i), group = "";
-
-			for (int j = 0; j < equation.length(); j++) {
-				if (equation[i+j] == ')') {
-					group = equation.substr(i, j+1);
+		if (std::isdigit(equation[i]) && equation[i + 1] == '(') {
+			std::string group = "";
+			for (int j = 0; i+1 + j < equation.length(); j++) {
+				if (equation[i+1 + j] == ')') {
+					group = equation.substr(i+1, j);
 					break;
 				}
 			}
+			equation = equation.substr(0, i) + MulGroup(group, equation.substr(i, 1)) + equation.substr(i + group.length()+1, equation.length() + 1);
+		}
+		else if (IsOperator(equation[i]) || equation[i] == '=') {
+			std::string replaceStr = "";
+			if (equation[i - 1] != ' ')
+				replaceStr += " ";
+			replaceStr += equation[i];
+			if (equation[i + 1] != ' ')
+				replaceStr += " ";
 
-			if (CanSolveAll(group))
-				equation = ReplaceInString(equation, num, num + " * ");
-			else
-				equation = ReplaceInString(equation, equation.substr(i - num.length(), num.length() + group.length()), MulGroup(group, num));
+			equation = equation.substr(0, i) + replaceStr + equation.substr(i + 1, equation.length() + 1);
 		}
 	}
 
-	for (int i = 0; i < equation.length(); i++) {
-		if (!IsOperator(equation[i]) && equation[i] != '=')
-			continue;
-
-		if (equation[i] == '-' && (equation[i + 1] == '(' || std::isdigit(equation[i + 1]) || std::isalpha(equation[i + 1])))
-			continue;
-
-		if(equation[i-1] != ' ' && equation[i+1] != ' ')
-			operatorsIndexes.push_back(i);
-	}
-
-	while (operatorsIndexes.size() > 0) {
-		int index = operatorsIndexes[operatorsIndexes.size() - 1];
-		operatorsIndexes.pop_back();
-
-		std::string replace = "   ";
-		replace[1] = equation[index];
-		equation = ReplaceInString(equation, equation.substr(index, 1), replace);
-	}
-
-	return ReplaceInString(equation, "+ -", "-");
-	//*/
+	return equation;
 }
 std::string StringMathSolver::ReplaceInString(std::string base, std::string from, std::string to) {
 	if (base.length() == 0 || from.length() == 0)
