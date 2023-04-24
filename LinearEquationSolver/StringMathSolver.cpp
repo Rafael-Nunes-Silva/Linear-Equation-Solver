@@ -1,6 +1,33 @@
 #include "StringMathSolver.hpp"
 
 std::string StringMathSolver::FormatEquation(std::string equation) {
+	for (int i = equation.length(); i >= 0; i--) {
+		if (!IsOperator(equation[i]) && equation[i] != '=')
+			continue;
+		std::string replaceStr = "";
+		if (equation[i - 1] != ' ')
+			replaceStr += " ";
+		replaceStr += equation[i];
+		if (equation[i + 1] != ' ')
+			replaceStr += " ";
+
+		equation = equation.substr(0, i) + replaceStr + equation.substr(i + 1, equation.length() + 1);
+	}
+
+	return equation;
+
+	/*
+	for (int i = 0; i < equation.length(); i++) {
+
+	}
+
+	equation = ReplaceInString(equation, "+", " + ");
+	equation = ReplaceInString(equation, "-", " - ");
+	equation = ReplaceInString(equation, "*", " * ");
+	equation = ReplaceInString(equation, "/", " / ");
+	return equation;
+	*/
+	/*
 	std::vector<int> operatorsIndexes = std::vector<int>();
 
 	for (int i = equation.length() - 1; i > 0; i--) {
@@ -42,6 +69,7 @@ std::string StringMathSolver::FormatEquation(std::string equation) {
 	}
 
 	return ReplaceInString(equation, "+ -", "-");
+	//*/
 }
 std::string StringMathSolver::ReplaceInString(std::string base, std::string from, std::string to) {
 	if (base.length() == 0 || from.length() == 0)
@@ -55,7 +83,7 @@ std::string StringMathSolver::ReplaceInString(std::string base, std::string from
 			return result;
 		}
 	}
-	// std::cout << "Could not find to replace: " << base << " ('" << from << "' -> '" << to << "')\n";
+	std::cout << "Could not find to replace: " << base << " ('" << from << "' -> '" << to << "')\n";
 	return base;
 }
 
@@ -142,7 +170,7 @@ bool StringMathSolver::HasGroup(std::string equation) {
 	return false;
 }
 bool StringMathSolver::HasExpression(std::string equation) {
-	for (int i = 0; i < equation.length(); i++) {
+	for (int i = 1; i < equation.length()-1; i++) {
 		if (!IsOperator(equation[i]))
 			continue;
 
@@ -193,7 +221,7 @@ std::string StringMathSolver::IsolateVariables(std::string equation) {
 			continue;
 		}
 
-		if (i==0||(leftSide[i-1]!=' '&&leftSide[i+1]!=' ')) {
+		if (i == 0 || (leftSide[i - 1] != ' ' && leftSide[i + 1] != ' ')) {
 			i++;
 			continue;
 		}
@@ -354,54 +382,58 @@ std::string StringMathSolver::SolveEquation(std::string equation) {
 	equation = FormatEquation(equation);
 	if (equation != tempEquation) {
 		tempEquation = equation;
-		std::cout << tempEquation << "\n";
+		std::cout << "\n" << tempEquation << "\n";
 	}
 
-	equation = SolveEquationsGroups(equation);
-	if (equation != tempEquation) {
-		tempEquation = equation;
-		std::cout << tempEquation << "\n";
-	}
-	equation = SolveEquationsExpressions(equation);
-	if (equation != tempEquation) {
-		tempEquation = equation;
-		std::cout << tempEquation << "\n";
-	}
-
-	equation = IsolateVariables(equation);
-	if (equation != tempEquation) {
-		tempEquation = equation;
-		std::cout << tempEquation << "\n";
-	}
-	
-	equation = SolveEquationsGroups(equation);
-	if (equation != tempEquation) {
-		tempEquation = equation;
-		std::cout << tempEquation << "\n";
-	}
-	equation = SolveEquationsExpressions(equation);
-	if (equation != tempEquation) {
-		tempEquation = equation;
-		std::cout << tempEquation << "\n";
-	}
-
-	for (int i = 1; i < equation.length(); i++) {
-		if (std::isalpha(equation[i])) {
-			std::string numLeft = GetNumberLeft(equation, i);
-
-			std::string tempRightSide = GetEquationRightSide(equation) + " / " + numLeft;
-
-			equation = ReplaceInString(equation, GetEquationRightSide(equation), tempRightSide);
-			equation = ReplaceInString(equation, numLeft, "");
-			break;
+	do {
+		equation = SolveEquationsGroups(equation);
+		if (equation != tempEquation) {
+			tempEquation = equation;
+			std::cout << "\n" << tempEquation << "\n";
 		}
-	}
-	if (equation != tempEquation) {
-		tempEquation = equation;
-		std::cout << tempEquation << "\n";
-	}
+		equation = SolveEquationsExpressions(equation);
+		if (equation != tempEquation) {
+			tempEquation = equation;
+			std::cout << "\n" <<tempEquation << "\n";
+		}
 
-	return SolveEquationsExpressions(equation);
+		equation = IsolateVariables(equation);
+		if (equation != tempEquation) {
+			tempEquation = equation;
+			std::cout << "\n" << tempEquation << "\n";
+		}
+
+		equation = SolveEquationsGroups(equation);
+		if (equation != tempEquation) {
+			tempEquation = equation;
+			std::cout << "\n" << tempEquation << "\n";
+		}
+		equation = SolveEquationsExpressions(equation);
+		if (equation != tempEquation) {
+			tempEquation = equation;
+			std::cout << "\n" << tempEquation << "\n";
+		}
+
+		for (int i = 1; i < equation.length(); i++) {
+			if (std::isalpha(equation[i])) {
+				std::string numLeft = GetNumberLeft(equation, i);
+
+				std::string tempRightSide = GetEquationRightSide(equation) + " / " + numLeft;
+
+				equation = ReplaceInString(equation, GetEquationRightSide(equation), tempRightSide);
+				equation = ReplaceInString(equation, numLeft, "");
+				break;
+			}
+		}
+		if (equation != tempEquation) {
+			tempEquation = equation;
+			std::cout << "\n" << tempEquation << "\n";
+		}
+
+		tempEquation = SolveEquationsExpressions(tempEquation);
+	} while (HasGroup(tempEquation) || HasExpression(tempEquation));
+
+	return tempEquation; // SolveEquationsExpressions(equation);
 }
 std::string StringMathSolver::SolveEquationsGroups(std::string equation) {
 	while (HasGroup(equation)) {
@@ -421,7 +453,7 @@ std::string StringMathSolver::SolveGroup(std::string group) {
 	if (!HasExpression(group))
 		group.substr(1, group.length() - 2);
 
-	std::cout << group << ":\n";
+	// std::cout << group << ":\n";
 	while (HasExpression(group)) {
 		std::string highiestExpression = GetHighierOrderExpression(group);
 		group = ReplaceInString(group, highiestExpression, SolveExpression(highiestExpression));
@@ -431,7 +463,7 @@ std::string StringMathSolver::SolveGroup(std::string group) {
 std::string StringMathSolver::SolveExpression(std::string expression) {
 	int operatorIndex = 0;
 	char operation = '-';
-	for (int i = 1; i < expression.length(); i++) {
+	for (int i = 1; i < expression.length()-1; i++) {
 		if (IsOperator(expression[i]) && expression[i-1]==' ' && expression[i+1]==' ') {
 			operatorIndex = i;
 			operation = expression[i];
@@ -439,7 +471,7 @@ std::string StringMathSolver::SolveExpression(std::string expression) {
 		}
 	}
 
-	std::cout << expression << " -> ";
+	std::cout << "\n" << expression << " --> ";
 
 	std::string numLeft = "?", numRight = "?", result="?";
 	switch (operation){
